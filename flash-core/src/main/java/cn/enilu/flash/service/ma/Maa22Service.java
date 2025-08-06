@@ -25,6 +25,30 @@ public class Maa22Service extends BaseService<Maa22,Long,Maa22Repository>{
 		repository.UpdateStatusByMaa22002(maa22002, StatusEnum.VOID.getValue());
 	}
 	
+	/**
+	 * 確認資料
+	 * @param 合約編號PK
+	 */
+	public void ConfirmByMaa22002(Long maa22002) {
+		repository.UpdateStatusByMaa22002(maa22002, StatusEnum.CONFIRM.getValue());
+	}
+	
+	/**
+	 * 取消確認資料，退回新增狀態
+	 * @param 合約編號PK
+	 */
+	public void CancelConfirmByMaa22002(Long maa22002) {
+		repository.UpdateStatusByMaa22002(maa22002, StatusEnum.CREATE.getValue());
+	}
+	
+	/**
+	 * 合約發出
+	 * @param 合約編號PK
+	 */
+	public void IssueByMaa22002(Long maa22002) {
+		repository.UpdateStatusByMaa22002(maa22002, StatusEnum.POISSUE.getValue());
+	}
+	
 	public enum StatusEnum {
 		
 		CREATE(0),

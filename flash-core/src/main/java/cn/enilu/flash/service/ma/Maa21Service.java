@@ -64,6 +64,30 @@ public class Maa21Service extends BaseService<Maa21,Long,Maa21Repository>{
 		repository.UpdateStatusById(id, StatusEnum.VOID.getValue());
 	}
 	
+	/**
+	 * 確認資料
+	 * @param id
+	 */
+	public void ConfirmById(Long id) {
+		repository.UpdateStatusById(id, StatusEnum.CONFIRM.getValue());
+	}
+	
+	/**
+	 * 取消確認，退回新增狀態
+	 * @param id
+	 */
+	public void CancelConfirmById(Long id) {
+		repository.UpdateStatusById(id, StatusEnum.CREATE.getValue());
+	}
+	
+	/**
+	 * PO發出
+	 * @param id
+	 */
+	public void IssueById(Long id) {
+		repository.UpdateStatusById(id, StatusEnum.POISSUE.getValue());
+	}
+	
 	public enum StatusEnum {
 		
 		CREATE(0),

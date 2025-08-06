@@ -27,6 +27,7 @@ import cn.enilu.flash.bean.vo.ma.Maa22Vo;
 import cn.enilu.flash.bean.vo.ma.MaaVo;
 import cn.enilu.flash.bean.vo.query.SearchFilter;
 import cn.enilu.flash.service.ma.Maa21Service;
+import cn.enilu.flash.service.ma.Maa21Service.StatusEnum;
 import cn.enilu.flash.service.ma.Maa22Service;
 import cn.enilu.flash.service.ma.Maa93Service;
 import cn.enilu.flash.service.system.DeptService;
@@ -56,15 +57,44 @@ public class Maa21Controller extends BaseController{
 	
 	@RequestMapping(value = "/list",method = RequestMethod.GET)
 	public Object list(@RequestParam(required = false) String selMaa21002,String selMaa21003) {
+        
+        Page<Maa21> page = this.getPOList(selMaa21002, selMaa21003, "");//get all data
+        
+		return Rets.success(page);
+	}
+	
+	@RequestMapping(value = "/listByPOIssue",method = RequestMethod.GET)
+	public Object listByPOIssue(@RequestParam(required = false) String selMaa21002,String selMaa21003) {
+		
+		Page<Maa21> page = this.getPOList(selMaa21002, selMaa21003, ""+StatusEnum.POISSUE.getValue());
+		
+		
+		return Rets.success(page);
+	}
+	
+	/**
+	 * get vendor PO data list
+	 * @param poNo 
+	 * @param projectId
+	 * @param status data status
+	 * @return
+	 */
+	public Page<Maa21> getPOList(String poNo,String projectId,String status) {
+		
 		Page<Maa21> page = new PageFactory<Maa21>().defaultPage();
-		if(StringUtil.isNullOrEmpty(selMaa21002)) {
+		
+		if(StringUtil.isNullOrEmpty(poNo)) {
 			
 		}else {
-			page.addFilter( "maa21002", SearchFilter.Operator.LIKE, selMaa21002);
+			page.addFilter( "maa21002", SearchFilter.Operator.LIKE, poNo);
 		}
-		if(!StringUtil.isNullOrEmpty(selMaa21003)) {
+		if(!StringUtil.isNullOrEmpty(projectId)) {
 			
-			page.addFilter( "maa21003", SearchFilter.Operator.EQ, selMaa21003);
+			page.addFilter( "maa21003", SearchFilter.Operator.EQ, projectId);
+		}
+		if(!StringUtil.isNullOrEmpty(status)) {
+			
+			page.addFilter( "maa21021", SearchFilter.Operator.EQ, status);
 		}
 		List<Order> orderList = new ArrayList<Order>();
 		orderList.add(new Order(Sort.Direction.DESC,"maa21002"));
@@ -85,9 +115,8 @@ public class Maa21Controller extends BaseController{
 		List list = (List) new Maa21Wrapper(itemList, BeanUtil.objectsToMaps(page.getRecords())).warp();
 		
         page.setRecords(list);
-        
-        
-		return Rets.success(page);
+		
+		return page;
 	}
 	
 	@Transactional
@@ -211,5 +240,22 @@ public class Maa21Controller extends BaseController{
         return Rets.success();
     }
 	
+	@Transactional
+	@RequestMapping(value = "/poConfirm",method = RequestMethod.GET)
+    public Object poCconfirm(Long id, int type) {
+		
+		if(type == 1) {//確認合約
+			maa21Service.ConfirmById(id);
+			maa22Service.ConfirmByMaa22002(id);
+		}else if(type == 0) {//取消確認
+			maa21Service.CancelConfirmById(id);
+			maa22Service.CancelConfirmByMaa22002(id);
+		}else if(type == 2) {//合約發出
+			maa21Service.IssueById(id);
+			maa22Service.IssueByMaa22002(id);
+		}
+		
+        return Rets.success();
+    }
 	
 }
